@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Sample is not input, input is gained from url like https://adventofcode.com/2021/day/1/input
+
 # Script for Advent of Code, download the sample input found for each challange.
 # Pulls the first sample found between <pre><code>...</pre></code>
 
