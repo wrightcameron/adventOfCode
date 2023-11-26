@@ -1,0 +1,3 @@
+# Ignore directories data or input, don't push inputs given by Advent Of Code.
+data/
+input/
