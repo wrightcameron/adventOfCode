@@ -11,7 +11,6 @@ pub fn check_depth_increase(input: &String) -> i32 {
     return count;
 }
 
-
 pub fn check_depth_sliding_window(input: &String) -> i32 {
     let mut count = 0;
     let mut previous_sum = i32::MAX;
