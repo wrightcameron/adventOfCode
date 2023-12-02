@@ -1,10 +1,10 @@
 use log::debug;
 
 /// Solution to Advent of Code Day 2 Problem 1
-/// 
+///
 /// Parse each line of input, find which rounds in each game
 /// that has too many dice to be valid.
-/// 
+///
 /// * `input` - input text
 pub fn problem1(input: &String) -> u32 {
     debug!("Starting Day 2");
@@ -13,19 +13,18 @@ pub fn problem1(input: &String) -> u32 {
 
     for line in lines {
         let (game_id, valid) = parse_line(line);
-        if valid{
+        if valid {
             games += game_id;
         }
-       
     }
     return games;
 }
 
 /// Solution to Advent of Code Day 2 Problem 2
-/// 
+///
 /// Parse each line of input, find the minimum amount of dice
 /// to play that round.
-/// 
+///
 /// * `input` - input text
 pub fn problem2(input: &String) -> u32 {
     let lines = input.lines();
@@ -39,7 +38,7 @@ pub fn problem2(input: &String) -> u32 {
         // Parse the game id out of game, the parse pulls ints out of strings.
         let game_id: u16 = game.replace("Game ", "").parse().unwrap();
         let dice_games = rest.split("; ").collect::<Vec<&str>>();
-        
+
         let mut fewest_red_dice = 1;
         let mut fewest_green_dice = 1;
         let mut fewest_blue_dice = 1;
@@ -65,9 +64,8 @@ pub fn problem2(input: &String) -> u32 {
     return total;
 }
 
-
 /// Parse line to gain game id and if entire game is valid
-/// 
+///
 /// * `line` - game
 fn parse_line(line: &str) -> (u32, bool) {
     debug!("The full line is '{line}'");
@@ -78,7 +76,7 @@ fn parse_line(line: &str) -> (u32, bool) {
     // Parse the game id out of game, the parse pulls ints out of strings.
     let game_id: u32 = game.replace("Game ", "").parse().unwrap();
     let dice_games = rest.split("; ").collect::<Vec<&str>>();
-    
+
     let red_dice = 12;
     let green_dice = 13;
     let blue_dice = 14;
@@ -98,22 +96,25 @@ fn parse_line(line: &str) -> (u32, bool) {
 }
 
 /// Parse round of dice game
-/// 
+///
 /// A dice game can contain n rounds, this parses one round and
 /// returns the number of red, green, blue dice.
-/// 
+///
 /// * `dice_round` - String reprentation of dice round.
-fn parse_round(round: &str) ->  (u32, u32, u32) {
-    let colors:  Vec<(String, u32)> = round.split(", ").map(| dice | {
-        let (amount, color) = dice.split_once(' ').unwrap();
-        let amount: u32 = amount.parse().unwrap();
-        (color.to_string(), amount)
-    }).collect();
+fn parse_round(round: &str) -> (u32, u32, u32) {
+    let colors: Vec<(String, u32)> = round
+        .split(", ")
+        .map(|dice| {
+            let (amount, color) = dice.split_once(' ').unwrap();
+            let amount: u32 = amount.parse().unwrap();
+            (color.to_string(), amount)
+        })
+        .collect();
 
     let mut red = 0;
     let mut green = 0;
     let mut blue = 0;
-    
+
     // Find ammount of red, green, blue dice.  Add them all up
     // into tuple
     for (color, amount) in colors {
@@ -126,4 +127,30 @@ fn parse_round(round: &str) ->  (u32, u32, u32) {
         }
     }
     return (red, green, blue);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    //Arrange
+    //Act
+    //Assert
+
+    #[test]
+    fn test_problem1() {
+        let input =
+            fs::read_to_string("data/sample/day_02_sample.txt").expect("Data file doesn't exist!");
+        let expected = 8;
+        assert_eq!(problem1(&input), expected);
+    }
+
+    #[test]
+    fn test_problem2() {
+        let input =
+            fs::read_to_string("data/sample/day_02_sample.txt").expect("Data file doesn't exist!");
+        let expected = 2286;
+        assert_eq!(problem2(&input), expected);
+    }
 }

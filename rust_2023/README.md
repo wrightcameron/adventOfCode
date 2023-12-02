@@ -3,7 +3,6 @@
 ## Requirements
 
 - Rust
-- rust-analyzer VSCode Extension(Debugging)
 
 ## Build
 
@@ -20,6 +19,10 @@ cargo run -- [-e --each] [-d --day <DAY>] [-i --init]
 ### Environmental Variables
 
 Logging can be enables by setting `RUST_LOG=debug`
+
+## Testing
+
+Rust unit tests can be started with `cargo test`.
 
 ## Resources
 

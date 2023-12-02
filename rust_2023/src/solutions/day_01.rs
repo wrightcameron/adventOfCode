@@ -1,5 +1,4 @@
 use log::debug;
-use std::collections::HashMap;
 
 /// Solution to Advent of Code Problem 1
 ///
@@ -8,13 +7,11 @@ use std::collections::HashMap;
 ///
 /// * `input` - input Text
 pub fn problem1(input: &String) -> i32 {
-    // TODO Add regex that removes non numbers
-    // TODO Parse all the values, find the ints, ignore the strings
     //Split all lines and convert all lines to strings, collect them in a vector
     let lines = input
-        .split("\n")
-        .map(|depth| depth.parse::<String>().expect("Error parsing line"))
-        .collect::<Vec<String>>();
+        .lines()
+        .map(|line| line.chars().filter(|c| c.is_ascii_digit()).collect())
+        .collect();
     return add_and_sum_lines(&lines);
 }
 
@@ -27,39 +24,33 @@ pub fn problem1(input: &String) -> i32 {
 /// * `input` - input Text
 pub fn problem2(input: &String) -> i32 {
     // Could replace with one1one, but this is completly broken
-    let mut numbers_to_digits = HashMap::new();
-    numbers_to_digits.insert("one".to_string(), "1ne".to_string());
-    numbers_to_digits.insert("two".to_string(), "2wo".to_string());
-    numbers_to_digits.insert("three".to_string(), "3hree".to_string());
-    numbers_to_digits.insert("four".to_string(), "4our".to_string());
-    numbers_to_digits.insert("five".to_string(), "5ive".to_string());
-    numbers_to_digits.insert("six".to_string(), "6ix".to_string());
-    numbers_to_digits.insert("seven".to_string(), "7even".to_string());
-    numbers_to_digits.insert("eight".to_string(), "8ight".to_string());
-    numbers_to_digits.insert("nine".to_string(), "9ine".to_string());
+    let numbers_to_digits: [(&str, &str); 9] = [
+        ("one", "1ne"),
+        ("two", "2wo"),
+        ("three", "3three"),
+        ("four", "4our"),
+        ("five", "5ive"),
+        ("six", "6ix"),
+        ("seven", "7even"),
+        ("eight", "8ight"),
+        ("nine", "9ine"),
+    ];
 
-    let mut input_vector = input
-        .split("\n")
-        .map(|depth| depth.parse::<String>().expect("Error parsing line"))
-        .collect::<Vec<String>>();
-    // input_vector.pop();  // TODO For some reason on Linux, the last of the input is a new line.
-
-    // let mut let_rename_this_later  = Vec::new();
-
-    // iitermut
-    for line in input_vector.iter_mut() {
-        // Turn the string into a char for loop, and build the
-        let mut new_line = String::from("");
-
-        for c in line.chars() {
-            new_line.push(c);
-            // Compare the string with all the numbers
-            for (key, value) in &numbers_to_digits {
-                new_line = new_line.replace(&*key, &value);
+    let input_vector = input
+        .lines()
+        .map(|line| {
+            let mut new_line = String::from("");
+            for c in line.chars() {
+                new_line.push(c);
+                // Compare the string with all the numbers
+                for (key, value) in &numbers_to_digits {
+                    new_line = new_line.replace(&*key, &value);
+                }
             }
-        }
-        *line = new_line;
-    }
+            return new_line;
+        })
+        .collect();
+
     return add_and_sum_lines(&input_vector);
 }
 
@@ -95,4 +86,41 @@ fn add_and_sum_lines(input: &Vec<String>) -> i32 {
         final_sum += number;
     }
     return final_sum;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    //Arrange
+    //Act
+    //Assert
+
+    #[test]
+    fn test_problem1() {
+        let input =
+            fs::read_to_string("data/sample/day_01_sample.txt").expect("Data file doesn't exist!");
+        let expected = 142;
+        assert_eq!(problem1(&input), expected);
+    }
+
+    #[test]
+    fn test_problem2() {
+        let input =
+            fs::read_to_string("data/sample/day_01_sample2.txt").expect("Data file doesn't exist!");
+        let expected = 281;
+        assert_eq!(problem2(&input), expected);
+    }
+
+    #[test]
+    fn test_add_and_sum_lines() {
+        let input = fs::read_to_string("data/sample/day_01_sample.txt")
+            .expect("Data file doesn't exist!")
+            .lines()
+            .map(|x| x.to_string())
+            .collect();
+        let expected = 142;
+        assert_eq!(add_and_sum_lines(&input), expected);
+    }
 }
