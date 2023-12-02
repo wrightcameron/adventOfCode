@@ -6,9 +6,14 @@ use std::fs;
 use clap::Parser;
 use std::io::ErrorKind;
 
+// env_logger::init();
+
 fn main() -> std::io::Result<()> {
+    // Enable logging
+    env_logger::init();
+
     let args = Args::parse();
-    
+
     if args.init {
         // TODO Rework this, rather have two files one for the sample and one for the input.
         fs::create_dir("data")
@@ -86,7 +91,7 @@ fn main() -> std::io::Result<()> {
             25 => run_day_25(),
             _ => println!("Did not find a matching day"),
         }
-    } 
+    }  // TODO For some reason on Linux, the last of the input is a new line.
     Ok(())
 }
 
