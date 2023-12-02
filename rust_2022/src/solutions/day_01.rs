@@ -1,42 +1,42 @@
-pub fn findElf(input: &String) -> i32 {
+pub fn problem1(input: &String) -> i32 {
     let mut sum = 0;
-    let mut maxSum = 0;
+    let mut max_sum = 0;
     // Read the file line by line using the lines() iterator from std::io::BufRead.
     for line in input.lines() {
         if line.chars().count() == 0 {
             println!("Sum {}", sum);
-            if sum > maxSum {
-                maxSum = sum;
+            if sum > max_sum {
+                max_sum = sum;
             }
             sum = 0;  // Sum should be restarted 
         } else {
            sum += line.parse::<i32>().unwrap(); 
         }
     }
-    return maxSum
+    return max_sum
 }
 
 
-pub fn findCaloricElf(input: &String) -> i32 {
+pub fn problem2(input: &String) -> i32 {
     let mut sum = 0;
     // Replace this maxSum with a Array containing 3 spots, starting each with 0
-    let mut maxSumsArray: [i32; 3] = [0,0,0];
-    let mut maxSum = 0;
+    let mut max_sums_array: [i32; 3] = [0,0,0];
+    // let max_sum: i32 = 0;
     
     // Read the file line by line using the lines() iterator from std::io::BufRead.
     for line in input.lines() {
         if line.chars().count() == 0 {
             println!("Finished Elf");
-            addNumToArray(sum,&mut maxSumsArray);
+            add_num_to_array(sum,&mut max_sums_array);
             sum = 0;  // Sum should be restarted
         } else {
            sum += line.parse::<i32>().unwrap(); 
         }
     }
-    return sumArray(&maxSumsArray);
+    return sum_array(&max_sums_array);
 }
 
-fn addNumToArray(n: i32, arr: &mut [i32]) {
+fn add_num_to_array(n: i32, arr: &mut [i32]) {
     println!("Number to add: {}, Array {:?}", n, arr); 
     //TODO Get this refactored into loop
     if n < arr[0]{
@@ -53,10 +53,10 @@ fn addNumToArray(n: i32, arr: &mut [i32]) {
     }
 }
 
-fn sumArray(arr: &[i32]) -> i32 {
-    let mut maxSum = 0;
+fn sum_array(arr: &[i32]) -> i32 {
+    let mut max_sum = 0;
     for i in 0..arr.len() {
-        maxSum += arr[i];
+        max_sum += arr[i];
     }
-    return maxSum;
+    return max_sum;
 }

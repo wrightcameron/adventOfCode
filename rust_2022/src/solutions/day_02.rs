@@ -54,10 +54,10 @@ pub fn problem2(input: &String) -> i32 {
         let opp = char_vec[0].to_string();
         let you = char_vec[2].to_string();
 
-        let ourHand = calcHand(&opp, &you);
+        let our_hand = calc_hand(&opp, &you);
 
         //Result
-        let mut res = roshambo(&opp, &ourHand);
+        let mut res = roshambo(&opp, &our_hand);
         if res == -2 || res == 2 {
             res = res * -1;
         }
@@ -72,11 +72,11 @@ pub fn problem2(input: &String) -> i32 {
             score = 0;
         }
 
-        if ourHand.eq("X") {
+        if our_hand.eq("X") {
             score += 1;
-        } else if ourHand.eq("Y") {
+        } else if our_hand.eq("Y") {
             score += 2;
-        } else if ourHand.eq("Z") {
+        } else if our_hand.eq("Z") {
             score += 3;
         }else{
             score += 0;
@@ -120,52 +120,52 @@ fn roshambo(op: &str, me: &str) -> i32{
 }
 
 
-fn calcHand(opHand: &str, outcome: &str) -> String{
-    let mut desiredHand = String::new();
+fn calc_hand(op_hand: &str, outcome: &str) -> String{
+    let mut desired_hand = String::new();
     //Opponent plays Rock
-    if opHand.eq("A") {
+    if op_hand.eq("A") {
         // I should lose - Scissors
         if outcome.eq("X") {
-            desiredHand = String::from("Z");
+            desired_hand = String::from("Z");
         }
         // I should draw - Rock
         else if outcome.eq("Y") {
-            desiredHand = String::from("X");
+            desired_hand = String::from("X");
         }
         // I should win - Paper
         else if outcome.eq("Z") {
-            desiredHand = String::from("Y");
+            desired_hand = String::from("Y");
         }
     }
     //Opponent plays Paper
-    else if opHand.eq("B") {
+    else if op_hand.eq("B") {
         // I should lose - Rock
         if outcome.eq("X") {
-            desiredHand = String::from("X");
+            desired_hand = String::from("X");
         }
         // I should draw - Paper
         else if outcome.eq("Y") {
-            desiredHand = String::from("Y");
+            desired_hand = String::from("Y");
         }
         // I should win - Scissors
         else if outcome.eq("Z") {
-            desiredHand = String::from("Z");
+            desired_hand = String::from("Z");
         }
     }
     //Opponent plays Scissors
-    else if opHand.eq("C") {
+    else if op_hand.eq("C") {
         // I should lose - Paper
         if outcome.eq("X") {
-            desiredHand = String::from("Y");
+            desired_hand = String::from("Y");
         }
         // I should draw - Scissors
         else if outcome.eq("Y") {
-            desiredHand = String::from("Z");
+            desired_hand = String::from("Z");
         }
         // I should win - Rock
         else if outcome.eq("Z") {
-            desiredHand = String::from("X");
+            desired_hand = String::from("X");
         }
     }
-    return desiredHand;
+    return desired_hand;
 }

@@ -108,9 +108,9 @@ struct Args {
 fn run_day_01(){
     let input = fs::read_to_string("data/day_01.txt")
         .expect("Data file doesn't exist!");
-    let mut output = solutions::day_01::findElf(&input);
+    let mut output = solutions::day_01::problem1(&input);
     println!("Part 1: Largest Sum Calories: \n{output}");
-    output = solutions::day_01::findCaloricElf(&input);
+    output = solutions::day_01::problem2(&input);
     println!("Part 2: Largest Sum Calories  \n{output}");
 }
 
@@ -126,7 +126,7 @@ fn run_day_02(){
 fn run_day_03(){
     let input = fs::read_to_string("data/day_03.txt")
         .expect("Data file doesn't exist!");
-    let output = solutions::day_03::binary_diagnostic(&input);
+    let output = solutions::day_03::problem1(&input);
     println!("Part 1: Position is {output}");
 }
 
