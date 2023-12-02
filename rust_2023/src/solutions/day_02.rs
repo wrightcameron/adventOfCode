@@ -1,59 +1,121 @@
 use log::debug;
 
-pub fn problem1(input: &String) -> u16 {
-    println!("Starting Day 2");
-    let stuff = input.lines();
+/// Solution to Advent of Code Day 2 Problem 1
+/// 
+/// Parse each line of input, find which rounds in each game
+/// that has too many dice to be valid.
+/// 
+/// * `input` - input text
+pub fn problem1(input: &String) -> u32 {
+    debug!("Starting Day 2");
+    let lines = input.lines();
     let mut games = 0;
-    let red_dice = 12;
-    let green_dice = 13;
-    let blue_dice = 14;
-    
-    for i in stuff {
-        let (game_id, red, green, blue) = parse_line(i);
-        println!("Game id {game_id}, red: {red}, green {green}, blue {blue}");
-        if red <= red_dice && green <= green_dice && blue <= blue_dice {
+
+    for line in lines {
+        let (game_id, valid) = parse_line(line);
+        if valid{
             games += game_id;
         }
+       
     }
     return games;
 }
 
+/// Solution to Advent of Code Day 2 Problem 2
+/// 
+/// Parse each line of input, find the minimum amount of dice
+/// to play that round.
+/// 
+/// * `input` - input text
+pub fn problem2(input: &String) -> u32 {
+    let lines = input.lines();
+    let mut total = 0;
 
-//TODO parse Line, return tuple size four Game ID, R, G, B
-fn parse_line(line: &str) -> (u16, u16, u16, u16) {
+    for line in lines {
+        // Parse the game id
+        let mut split = line.split(": ");
+        let game = split.next().unwrap();
+        let rest = split.next().unwrap();
+        // Parse the game id out of game, the parse pulls ints out of strings.
+        let game_id: u16 = game.replace("Game ", "").parse().unwrap();
+        let dice_games = rest.split("; ").collect::<Vec<&str>>();
+        
+        let mut fewest_red_dice = 1;
+        let mut fewest_green_dice = 1;
+        let mut fewest_blue_dice = 1;
+
+        // For the entire game find the fewest dice.
+        for dice_game in dice_games {
+            let (red, green, blue) = parse_round(dice_game);
+            if fewest_red_dice < red {
+                fewest_red_dice = red;
+            }
+            if fewest_green_dice < green {
+                fewest_green_dice = green;
+            }
+            if fewest_blue_dice < blue {
+                fewest_blue_dice = blue;
+            }
+        }
+        let power = fewest_red_dice * fewest_green_dice * fewest_blue_dice;
+        debug!("Game {game_id}: Power {power}");
+        total += power;
+        // debug!("The game is '{game_id}', while the rest of the line is '{rest}'");
+    }
+    return total;
+}
+
+
+/// Parse line to gain game id and if entire game is valid
+/// 
+/// * `line` - game
+fn parse_line(line: &str) -> (u32, bool) {
     debug!("The full line is '{line}'");
     // Parse the game id
     let mut split = line.split(": ");
     let game = split.next().unwrap();
     let rest = split.next().unwrap();
     // Parse the game id out of game, the parse pulls ints out of strings.
-    let game_id: u16 = game.replace("Game ", "").parse().unwrap();
+    let game_id: u32 = game.replace("Game ", "").parse().unwrap();
     let dice_games = rest.split("; ").collect::<Vec<&str>>();
     
-    let mut total_red = 0;
-    let mut total_green = 0;
-    let mut total_blue = 0;
+    let red_dice = 12;
+    let green_dice = 13;
+    let blue_dice = 14;
+
+    // If a round has too many dice the entire game is invalid
+    let mut valid = true;
     for dice_game in dice_games {
-        let (red, green, blue) = parse_dice_game(dice_game);
-        total_red += red;
-        total_green += green;
-        total_blue += blue;
+        let (red, green, blue) = parse_round(dice_game);
+        debug!("Game id {game_id}, red: {red}, green {green}, blue {blue}");
+        if red > red_dice || green > green_dice || blue > blue_dice {
+            valid = false;
+            break;
+        }
     }
     debug!("The game is '{game_id}', while the rest of the line is '{rest}'");
-    return (game_id, total_red, total_green, total_blue);
+    return (game_id, valid);
 }
 
-fn parse_dice_game(dice_game: &str) ->  (u16, u16, u16) {
-    let colors:  Vec<(String, u16)> = dice_game.split(", ").map(| dice | {
+/// Parse round of dice game
+/// 
+/// A dice game can contain n rounds, this parses one round and
+/// returns the number of red, green, blue dice.
+/// 
+/// * `dice_round` - String reprentation of dice round.
+fn parse_round(round: &str) ->  (u32, u32, u32) {
+    let colors:  Vec<(String, u32)> = round.split(", ").map(| dice | {
         let (amount, color) = dice.split_once(' ').unwrap();
-        let amount: u16 = amount.parse().unwrap();
+        let amount: u32 = amount.parse().unwrap();
         (color.to_string(), amount)
     }).collect();
 
     let mut red = 0;
     let mut green = 0;
     let mut blue = 0;
-
+    
+    // Find ammount of red, green, blue dice.  Add them all up
+    // into tuple
     for (color, amount) in colors {
         if color == "red" {
             red += amount;
