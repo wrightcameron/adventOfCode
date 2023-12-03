@@ -129,12 +129,12 @@ fn run_day_02(){
 }
 
 fn run_day_03(){
-    let input = fs::read_to_string("data/sample/day_03.txt")
+    let input = fs::read_to_string("data/day_03.txt")
         .expect("Data file doesn't exist!");
     let output = solutions::day_03::problem1(&input);
     println!("Part 1: The count is: {output}");
-    // output = solutions::day_02::problem2(&input);
-    // println!("Part 2: The count is: {output}");
+    let output = solutions::day_03::problem2(&input);
+    println!("Part 2: The count is: {output}");
 }
 
 fn run_day_04(){
