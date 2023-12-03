@@ -109,9 +109,9 @@ fn run_day_01(){
     let input = fs::read_to_string("data/day_01.txt")
         .expect("Data file doesn't exist!");
     let mut output = solutions::day_01::problem1(&input);
-    println!("Part 1: Largest Sum Calories: \n{output}");
+    println!("Part 1: Largest Sum Calories: {output}");
     output = solutions::day_01::problem2(&input);
-    println!("Part 2: Largest Sum Calories  \n{output}");
+    println!("Part 2: Largest Sum Calories {output}");
 }
 
 fn run_day_02(){
