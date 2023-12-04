@@ -11,12 +11,20 @@ pub fn problem1(input: &String) -> i32 {
     let total_points: Vec<i32> = input
         .lines()
         .map(|line| {
-            let (before, after) = line.split_once(": ").unwrap();
-            let _before = before.strip_prefix("Card ").unwrap();
-            // let id = before.parse().unwrap();
+            let (_before, after) = line.split_once(": ").unwrap();
             let (winning, your_numbers) = after.split_once(" | ").unwrap();
-            let winning = winning.trim().replace("  ", " ").split(" ").map(|x | x.parse().unwrap()).collect::<Vec<i32>>();
-            let your_numbers = your_numbers.trim().replace("  ", " ").split(" ").map(|x | x.parse().unwrap()).collect::<Vec<i32>>();
+            let winning = winning
+                .trim()
+                .replace("  ", " ")
+                .split(" ")
+                .map(|x| x.parse().unwrap())
+                .collect::<Vec<i32>>();
+            let your_numbers = your_numbers
+                .trim()
+                .replace("  ", " ")
+                .split(" ")
+                .map(|x| x.parse().unwrap())
+                .collect::<Vec<i32>>();
             debug!("Winning numbers are {:?}", winning);
             debug!("Your numbers are {:?}", your_numbers);
             let mut points = 0;
@@ -38,38 +46,49 @@ pub fn problem1(input: &String) -> i32 {
 }
 
 pub fn problem2(input: &String) -> i32 {
-    let scratchs: Vec<Scratch> = input
+    let mut scratchs: Vec<Scratch> = input
         .lines()
         .map(|line| {
             let (before, after) = line.split_once(": ").unwrap();
-            let _before = before.strip_prefix("Card ").unwrap();
-            let id = before.parse().unwrap();
+            let before = before.strip_prefix("Card ").unwrap();
+            let id = before.trim().parse().unwrap();
             let (winning, your_numbers) = after.split_once(" | ").unwrap();
-            let winning = winning.trim().replace("  ", " ").split(" ").map(|x | x.parse().unwrap()).collect::<Vec<i32>>();
-            let numbers = your_numbers.trim().replace("  ", " ").split(" ").map(|x | x.parse().unwrap()).collect::<Vec<i32>>();
+            let winning = winning
+                .trim()
+                .replace("  ", " ")
+                .split(" ")
+                .map(|x| x.parse().unwrap())
+                .collect::<Vec<i32>>();
+            let numbers = your_numbers
+                .trim()
+                .replace("  ", " ")
+                .split(" ")
+                .map(|x| x.parse().unwrap())
+                .collect::<Vec<i32>>();
             debug!("Winning numbers are {:?}", winning);
             debug!("Your numbers are {:?}", numbers);
-            Scratch {id, copies: 1, winning, numbers} 
+            Scratch {
+                id,
+                copies: 1,
+                winning,
+                numbers,
+            }
         })
         .collect();
-    // for (index, scratch) in scratchs.iter().enumerate() {
-    //     let points = count_points(&scratch.winning, &scratch.numbers);
-    //     for i in 0..points {
-    //         let true_index = i + index as i32;
-    //         let fut_scratch: &mut Scratch = scratchs.iter_mut().filter(| x | x.id == true_index).next().unwrap();
-    //         fut_scratch.copies += 1;
-    //         println!("Adding 1 copy to Card {}", scratch.id)
-    //     }
-    // }
     for i in 0..scratchs.len() {
         let scratch = &scratchs[i];
         let points = count_points(&scratch.winning, &scratch.numbers);
-        for j in 0..points + points {
-            
+        let copies = scratch.copies;
+        for j in 0..points {
+            let scratch2 = &mut scratchs[j as usize + i + 1];
+            scratch2.copies += 1 * copies;
         }
-        println!("Points are {points}")
+        debug!(
+            "Card {}, copies {}, points {}",
+            scratchs[i].id, scratchs[i].copies, points
+        )
     }
-    return 0;
+    return scratchs.iter().map(|x| x.copies).sum();
 }
 
 fn count_points(winning_nums: &Vec<i32>, numbers: &Vec<i32>) -> i32 {
@@ -81,12 +100,3 @@ fn count_points(winning_nums: &Vec<i32>, numbers: &Vec<i32>) -> i32 {
     }
     return points;
 }
-
-// fn add_copies(scratchs: &Vec<Scratch>, current_card: i32, points: i32) {
-//     for i in 0..points {
-//         let true_index = i + current_card;
-//         let scratch: &Scratch = scratchs.iter().filter(| x | x.id == true_index).next().unwrap();
-//         scratch.copies += 1;
-//         println!("Adding 1 copy to Card {}", scratch.id)
-//     }
-// }
