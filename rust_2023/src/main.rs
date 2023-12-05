@@ -151,8 +151,8 @@ fn run_day_05(){
         .expect("Data file doesn't exist!");
     let output = solutions::day_05::problem1(&input);
     println!("Part 1: The count is: {output}");
-    // let output = solutions::day_05::problem2(&input);
-    // println!("Part 2: The count is: {output}");
+    let output = solutions::day_05::problem2(&input);
+    println!("Part 2: The count is: {output}");
 }
 
 fn run_day_06(){
