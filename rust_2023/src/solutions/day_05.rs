@@ -1,0 +1,131 @@
+use log::debug;
+
+struct AlmanacMap {
+    destination: i64,
+    source: i64,
+    range: i64,
+}
+
+struct Almanac {
+    almanac_maps: Vec<AlmanacMap>,
+}
+
+pub fn problem1(input: &String) -> i64 {
+    // Parse the input, store them in a struct
+    let chunks: Vec<&str> = input.split("\n\n").collect::<Vec<&str>>();
+    let mut chunks_iter = chunks.iter();
+    let (_before, after) = chunks_iter.next().unwrap().split_once(":").unwrap();
+    let seeds = after.trim().split(" ").map(| x | x.parse().unwrap()).collect::<Vec<i64>>();
+    debug!("Seeds: {:?}", seeds);
+    // Parse the rest of the maps, looks like there alwasy are 7
+    
+    // Seed to Soil Map
+    let (_before, after) = chunks_iter.next().unwrap().split_once(":\n").unwrap();
+    let map = after.lines().collect::<Vec<&str>>();
+    let seed_soil = create_map(&map); 
+    debug!("seed-to-soil map:");
+    for map in &seed_soil.almanac_maps {
+        debug!(" {} {} {}", map.destination, map.source, map.range)
+    }
+
+    // soil-to-fertilizer
+    let (_before, after) = chunks_iter.next().unwrap().split_once(":\n").unwrap();
+    let map: Vec<&str> = after.lines().collect::<Vec<&str>>();
+    let soil_fertilizer = create_map(&map); 
+    println!("soil-to-fertilizer map:");
+    for map in &soil_fertilizer.almanac_maps {
+        println!(" {} {} {}", map.destination, map.source, map.range)
+    }
+
+    // fertilizer-to-water
+    let (_before, after) = chunks_iter.next().unwrap().split_once(":\n").unwrap();
+    let map = after.lines().collect::<Vec<&str>>();
+    let fertilizer_water = create_map(&map); 
+    debug!("fertilizer-to-water map:");
+    for map in &fertilizer_water.almanac_maps {
+        debug!(" {} {} {}", map.destination, map.source, map.range)
+    }
+
+    // water-to-light
+    let (_before, after) = chunks_iter.next().unwrap().split_once(":\n").unwrap();
+    let map = after.lines().collect::<Vec<&str>>();
+    let water_light = create_map(&map); 
+    debug!("water-to-light map:");
+    for map in &water_light.almanac_maps {
+        debug!(" {} {} {}", map.destination, map.source, map.range)
+    }
+
+    // light-to-temperature
+    let (_before, after) = chunks_iter.next().unwrap().split_once(":\n").unwrap();
+    let map = after.lines().collect::<Vec<&str>>();
+    let light_temperature = create_map(&map); 
+    debug!("light-to-temperature map:");
+    for map in &light_temperature.almanac_maps {
+        debug!(" {} {} {}", map.destination, map.source, map.range)
+    }
+
+    // temperature-to-humidity
+    let (_before, after) = chunks_iter.next().unwrap().split_once(":\n").unwrap();
+    let map = after.lines().collect::<Vec<&str>>();
+    let temperature_humidity = create_map(&map); 
+    debug!("temperature-to-humidity map:");
+    for map in &temperature_humidity.almanac_maps {
+        debug!(" {} {} {}", map.destination, map.source, map.range)
+    }
+
+    // humidity-to-location
+    let (_before, after) =chunks_iter.next().unwrap().split_once(":\n").unwrap();
+    let map = after.lines().collect::<Vec<&str>>();
+    let humidity_location = create_map(&map); 
+    debug!("humidity-to-location map:");
+    for map in &humidity_location.almanac_maps {
+        debug!(" {} {} {}", map.destination, map.source, map.range)
+    }
+
+    // Now for the rest
+    return seeds.iter().map(| i | {
+        println!("Starting Seed {}", i);
+        let temp = get_destination(&seed_soil.almanac_maps, *i);
+        println!("soil  {}", temp);
+        let temp = get_destination(&soil_fertilizer.almanac_maps, temp);
+        println!("fertilizer  {}", temp);
+        let temp = get_destination(&fertilizer_water.almanac_maps, temp);
+        println!("water  {}", temp);
+        let temp = get_destination(&water_light.almanac_maps, temp);
+        println!("light  {}", temp);
+        let temp = get_destination(&light_temperature.almanac_maps, temp);
+        println!("temperature  {}", temp);
+        let temp = get_destination(&temperature_humidity.almanac_maps, temp);
+        println!("humidity  {}", temp);
+        let temp = get_destination(&humidity_location.almanac_maps, temp);
+        println!("Location {}", temp);
+        return temp;
+    }).min().unwrap();
+}
+
+// pub fn problem2(input: &String) -> i64 {
+//     return 0;
+// }
+
+fn create_map(map_input: &Vec<&str>) -> Almanac {
+    let mut almanac_maps: Vec<AlmanacMap> = Vec::new();
+    for i in map_input {
+        // println!("Map: {:?}", i);
+        let j = i.trim().split(" ").map(| x | x.parse().unwrap() ).collect::<Vec<i64>>();
+        almanac_maps.push( AlmanacMap {destination: j[0], source: j[1], range: j[2] } )
+    }
+    return Almanac { almanac_maps: almanac_maps };
+}
+
+fn get_destination(maps: &Vec<AlmanacMap>, input: i64) -> i64 {
+    for range in maps.iter() {
+        // If source in range
+        println!("Source: {} - {}, Value:{}",  range.source,range.source + range.range, input);
+        if range.source <= input && input <= range.source + range.range {
+            println!("Found! Dest {}, {}", range.destination, range.destination + (range.source - input).abs() );
+            return range.destination + (range.source - input).abs();
+        }
+    }
+    return input;
+}
+

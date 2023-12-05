@@ -147,8 +147,14 @@ fn run_day_04(){
 }
 
 fn run_day_05(){
-    println!("Day 05 is not implented yet");
+    let input = fs::read_to_string("data/day_05.txt")
+        .expect("Data file doesn't exist!");
+    let output = solutions::day_05::problem1(&input);
+    println!("Part 1: The count is: {output}");
+    // let output = solutions::day_05::problem2(&input);
+    // println!("Part 2: The count is: {output}");
 }
+
 fn run_day_06(){
     println!("Day 06 is not implented yet");
 }
