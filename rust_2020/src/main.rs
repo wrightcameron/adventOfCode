@@ -125,17 +125,41 @@ fn run_day_02(){
 }
 
 fn run_day_03(){
-    println!("Day 04 is not implented yet");
+    let input = fs::read_to_string("data/day_03.txt")
+        .expect("Data file doesn't exist!");
+    let output = solutions::day_03::problem1(&input);
+    println!("Part 1: Answer is {output}");
+    let output = solutions::day_03::problem2(&input);
+    println!("Part 2: Answer is {output}");
 }
+
 fn run_day_04(){
-    println!("Day 04 is not implented yet");
+    let input = fs::read_to_string("data/day_04.txt")
+        .expect("Data file doesn't exist!");
+    let output = solutions::day_04::problem1(&input);
+    println!("Part 1: Answer is {output}");
+    // let output = solutions::day_04::problem2(&input);
+    // println!("Part 2: Answer is {output}");
 }
+
 fn run_day_05(){
-    println!("Day 05 is not implented yet");
+    let input = fs::read_to_string("data/day_05.txt")
+        .expect("Data file doesn't exist!");
+    let output = solutions::day_05::problem1(&input);
+    println!("Part 1: Answer is {output}");
+    // let output = solutions::day_05::problem2(&input);
+    // println!("Part 2: Answer is {output}");
 }
+
 fn run_day_06(){
-    println!("Day 06 is not implented yet");
+    let input = fs::read_to_string("data/day_06.txt")
+        .expect("Data file doesn't exist!");
+    let output = solutions::day_06::problem1(&input);
+    println!("Part 1: Answer is {output}");
+    let output = solutions::day_06::problem2(&input);
+    println!("Part 2: Answer is {output}");
 }
+
 fn run_day_07(){
     println!("Day 07 is not implented yet");
 }
