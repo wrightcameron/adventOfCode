@@ -1,8 +1,15 @@
 use log::debug;
 
+/// Find two entires that sum to 2020.
+///
+/// In the input each line is a number.  Loop through all lines and find
+/// the two lines that equal 2020.
 pub fn problem1(input: &String) -> i32 {
     // TODO Figure how to do this functionaly, with two iterators of the same vec.
-    let expense = input.lines().map(| x | x.parse().unwrap()).collect::<Vec<i32>>();
+    let expense = input
+        .lines()
+        .map(|x| x.parse().unwrap())
+        .collect::<Vec<i32>>();
     for i in expense.iter() {
         for j in expense.iter() {
             debug!("Sum is {}", i + j);
@@ -14,8 +21,15 @@ pub fn problem1(input: &String) -> i32 {
     return 0;
 }
 
+/// Find three entries that sum to 2020
+///
+/// In the input each line is a number.  Loop through all lines and find
+/// the three lines that equal 2020.
 pub fn problem2(input: &String) -> i32 {
-    let expense = input.lines().map(| x | x.parse().unwrap()).collect::<Vec<i32>>();
+    let expense = input
+        .lines()
+        .map(|x| x.parse().unwrap())
+        .collect::<Vec<i32>>();
     for x in expense.iter() {
         if *x > 2020 {
             continue;
@@ -36,27 +50,56 @@ pub fn problem2(input: &String) -> i32 {
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
+    use serde::Deserialize;
+    use serde_json;
     use std::fs;
+
+    #[derive(Deserialize, Debug)]
+    struct Solution {
+        id: String,
+        first: i64,
+        second: i64,
+    }
+
+    fn get_solution(day: String, problem: i8) -> i64 {
+        let json_string =
+            fs::read_to_string("data/solutions.json").expect("JSON file doesn't exist!");
+        let json: Vec<Solution> =
+            serde_json::from_str(&json_string).expect("JSON was not well-formatted");
+        let solution = json.iter().find(|x| x.id == day).unwrap();
+        return if problem == 1 {
+            solution.first
+        } else {
+            solution.second
+        };
+    }
 
     //Arrange
     //Act
     //Assert
-
     #[test]
     fn test_problem1() {
-        let input =
-            fs::read_to_string("data/sample/day_01.txt").expect("Data file doesn't exist!");
+        // Sample
+        let input = fs::read_to_string("data/sample/day_01.txt").expect("Data file doesn't exist!");
         let expected = 514579;
         assert_eq!(problem1(&input), expected);
+        //Actual
+        let input = fs::read_to_string("data/day_01.txt").expect("Data file doesn't exist!");
+        let expected = get_solution("day01".to_string(), 1);
+        assert_eq!(problem1(&input) as i64, expected);
     }
 
     #[test]
     fn test_problem2() {
-        let input =
-            fs::read_to_string("data/sample/day_01.txt").expect("Data file doesn't exist!");
+        // Sample
+        let input = fs::read_to_string("data/sample/day_01.txt").expect("Data file doesn't exist!");
         let expected = 241861950;
         assert_eq!(problem2(&input), expected);
+        // Actual
+        let input = fs::read_to_string("data/day_01.txt").expect("Data file doesn't exist!");
+        let expected = get_solution("day01".to_string(), 2);
+        assert_eq!(problem2(&input) as i64, expected);
     }
-
 }

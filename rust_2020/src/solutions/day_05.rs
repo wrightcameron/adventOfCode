@@ -1,5 +1,6 @@
 use log::debug;
 
+/// Find passanger with the highest seat id.
 pub fn problem1(input: &String) -> i32 {
     return input.lines().map(| x | x.chars().collect::<Vec<char>>() ).map(| x | {
         let seat_row = find_seat_row(&x, 0, 0, 127);
@@ -14,6 +15,7 @@ pub fn problem1(input: &String) -> i32 {
 //     return 0;
 // }
 
+/// Find row based on first 8 characters of boarding pass.
 fn find_seat_row(boarding_pass: &Vec<char>, index: usize, lower_bound: i32, upper_bound: i32) -> i32 {
     debug!("Range: {lower_bound} -> {upper_bound}");
     if index == 6 {
@@ -31,6 +33,7 @@ fn find_seat_row(boarding_pass: &Vec<char>, index: usize, lower_bound: i32, uppe
     }
 }
 
+/// Find seat based on last three chars of boarding pass
 fn find_seat(boarding_pass: &Vec<char>, index: usize, lower_bound: i32, upper_bound: i32) -> i32 {
     debug!("Seat Range: {lower_bound} -> {upper_bound}");
     if index == 2 {
@@ -50,24 +53,56 @@ fn find_seat(boarding_pass: &Vec<char>, index: usize, lower_bound: i32, upper_bo
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
+    use serde::Deserialize;
+    use serde_json;
     use std::fs;
+
+    #[derive(Deserialize, Debug)]
+    struct Solution {
+        id: String,
+        first: i64,
+        second: i64,
+    }
+
+    fn get_solution(day: String, problem: i8) -> i64 {
+        let json_string =
+            fs::read_to_string("data/solutions.json").expect("JSON file doesn't exist!");
+        let json: Vec<Solution> =
+            serde_json::from_str(&json_string).expect("JSON was not well-formatted");
+        let solution = json.iter().find(|x| x.id == day).unwrap();
+        return if problem == 1 {
+            solution.first
+        } else {
+            solution.second
+        };
+    }
 
     //Arrange
     //Act
     //Assert
-
     #[test]
     fn test_problem1() {
+        // Sample
         let input = fs::read_to_string("data/sample/day_05.txt").expect("Data file doesn't exist!");
         let expected = 820;
         assert_eq!(problem1(&input), expected);
+        //Actual
+        // let input = fs::read_to_string("data/day_05.txt").expect("Data file doesn't exist!");
+        // let expected = get_solution("day05".to_string(), 1);
+        // assert_eq!(problem1(&input), expected);
     }
 
     // #[test]
     // fn test_problem2() {
-    //     let input = fs::read_to_string("data/sample/day_04.txt").expect("Data file doesn't exist!");
-    //     let expected = 336;
+    //     // Sample
+    //     let input = fs::read_to_string("data/sample/day_05.txt").expect("Data file doesn't exist!");
+    //     let expected = 241861950;
     //     assert_eq!(problem2(&input), expected);
+    //     // Actual
+    //     let input = fs::read_to_string("data/day_05.txt").expect("Data file doesn't exist!");
+    //     let expected = get_solution("day05".to_string(), 2);
+    //     assert_eq!(problem1(&input), expected);
     // }
 }
