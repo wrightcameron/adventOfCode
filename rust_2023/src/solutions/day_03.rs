@@ -2,39 +2,48 @@ use log::debug;
 
 const SYMBOLS: [char; 11] = ['*', '#', '+', '$', '-', '&', '%', '@', '/', '=', '$'];
 
+/// Find all symbols and then sum up all numbers around symbols
 pub fn problem1(input: &String) -> i32 {
     // Create a 2D array, this array is going to be an array of arrays.
-    let lines = input.lines();
+    let engine_schematic: Vec<Vec<char>> = input
+        .lines()
+        .map(|x| x.chars().collect::<Vec<char>>())
+        .collect();
 
-    let mut engine_schematic: Vec<Vec<char>> = Vec::new();
-    for i in lines {
-        let test: Vec<char> = i.chars().collect();
-        engine_schematic.push(test)
-    }
     // print_exact_char_schematic(&engine_schematic, 0, 0);
 
-    let coords = find_coord_of_numbers(&engine_schematic);
-    let parts_coords = find_part_number_coord(&engine_schematic, &coords);
-
-    return build_whole_numbers(&engine_schematic, &parts_coords)
-        .iter()
-        .sum();
+    let coords = find_coord_of_symbols(&engine_schematic);
+    return coords.iter().map(| (x, y) | find_sum_around_cord(&engine_schematic, *x, *y)).sum();
 }
 
-// I messed up part 1 now that I see part 2.  In part 1 I hunted for numbers first then hunted for the symbols.
-// it would have been better to find coordinates of all symbols and then get all numbers closest to the symbol.
-// As I am now forced to do with gears.
+// Find all gear symbols and then multiple 2 numbers around gear and then sum up all those numbers.
 pub fn problem2(input: &String) -> i32 {
     // Find all gears
-    let lines = input.lines();
-    let mut engine_schematic: Vec<Vec<char>> = Vec::new();
-    for i in lines {
-        let test: Vec<char> = i.chars().collect();
-        engine_schematic.push(test)
-    }
+    let engine_schematic: Vec<Vec<char>> = input
+        .lines()
+        .map(|x| x.chars().collect::<Vec<char>>())
+        .collect();
     return get_gear_ratios(&engine_schematic).iter().sum();
 }
 
+///Find all the coordinates of the symbols in the engine schematic
+fn find_coord_of_symbols(schematic: &Vec<Vec<char>>) -> Vec<(usize, usize)> {
+    let mut coord: Vec<(usize, usize)> = Vec::new();
+    for (y, outer_vec) in schematic.iter().enumerate() {
+        for (x, element) in outer_vec.iter().enumerate() {
+            if SYMBOLS.contains(element) {
+                coord.push((x, y));
+                debug!("Found {element} at {x},{y}");
+            }
+        }
+    }
+    return coord;
+}
+
+/// Get all the gear ratios in the schematic
+/// 
+/// A gear ratio is a * symbol that has two numbers around it,
+/// both numbers have to be present and then are multiplied.
 fn get_gear_ratios(schematic: &Vec<Vec<char>>) -> Vec<i32> {
     let mut ratios: Vec<i32> = Vec::new();
     let gear = '*';
@@ -50,8 +59,8 @@ fn get_gear_ratios(schematic: &Vec<Vec<char>>) -> Vec<i32> {
     return ratios;
 }
 
-fn find_all_number_around_cord(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> i32 {
-    let mut numbers: Vec<i32> = Vec::new();
+/// Get all number coords around given coord
+fn get_all_number_cords_around_cord(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> Vec<(usize, usize)> {
     let mut number_coords: Vec<(usize, usize)> = Vec::new();
     //Upper Left
     if in_bounds(&schematic, x.saturating_sub(1), y.saturating_sub(1))
@@ -144,6 +153,13 @@ fn find_all_number_around_cord(schematic: &Vec<Vec<char>>, x: usize, y: usize) -
             number_coords.push((num_x, num_y));
         }
     }
+    return number_coords;
+}
+
+/// Get gear ratio (multiple of two numbers) around coord
+fn find_all_number_around_cord(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> i32 {
+    let mut numbers: Vec<i32> = Vec::new();
+    let number_coords: Vec<(usize, usize)> = get_all_number_cords_around_cord(schematic, x, y);
     for (x, y) in number_coords {
         let number = build_whole_number(&schematic, x, y);
         numbers.push(number);
@@ -161,6 +177,18 @@ fn find_all_number_around_cord(schematic: &Vec<Vec<char>>, x: usize, y: usize) -
     return gear_ratio;
 }
 
+/// Get sum of multiple numbers around coord
+fn find_sum_around_cord(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> i32 {
+    let mut numbers: Vec<i32> = Vec::new();
+    let number_coords: Vec<(usize, usize)> = get_all_number_cords_around_cord(schematic, x, y);
+    for (x, y) in number_coords {
+        let number = build_whole_number(&schematic, x, y);
+        numbers.push(number);
+    }
+    return numbers.iter().sum();
+}
+
+/// Find starting coord of a number, using recursion to shift left till first number is found
 fn find_number_starting_coord(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> (usize, usize) {
     if x == 0 {
         return (x, y);
@@ -171,50 +199,7 @@ fn find_number_starting_coord(schematic: &Vec<Vec<char>>, x: usize, y: usize) ->
     return find_number_starting_coord(&schematic, x - 1, y);
 }
 
-// Vec<(u32, u32)>
-fn find_coord_of_numbers(engine_schematic: &Vec<Vec<char>>) -> Vec<(usize, usize)> {
-    let mut coord: Vec<(usize, usize)> = Vec::new();
-    for (y, outer_vec) in engine_schematic.iter().enumerate() {
-        for (x, element) in outer_vec.iter().enumerate() {
-            if element.is_ascii_digit()
-                && (x == 0 || !is_coord_digit(&engine_schematic, x.saturating_sub(1), y))
-            {
-                coord.push((x, y));
-                debug!("Found {element} at {x},{y}");
-            }
-        }
-    }
-    return coord;
-}
-
-fn find_part_number_coord(
-    engine_schematic: &Vec<Vec<char>>,
-    number_coords: &Vec<(usize, usize)>,
-) -> Vec<(usize, usize)> {
-    // Check all number coords for all spots around it for symbols.
-    let mut coord: Vec<(usize, usize)> = Vec::new();
-
-    for (x, y) in number_coords {
-        // println!("Coordinates ({x},{y}), In Bounds {}, and symbols near?");
-        if recursive_find_symbol(&engine_schematic, *x, *y) {
-            coord.push((*x, *y));
-            debug!("Found part {} at {x},{y}", engine_schematic[*y][*x])
-        }
-    }
-    return coord;
-}
-
-fn recursive_find_symbol(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> bool {
-    // If out of bounds or number no longer digit return false
-    if !in_bounds(&schematic, x, y) || !is_coord_digit(&schematic, x, y) {
-        return false;
-    }
-    if symbol_near(&schematic, x, y) {
-        return true;
-    }
-    return recursive_find_symbol(&schematic, x + 1, y);
-}
-
+/// Combine all chars representing a number into an actual number represented as i32
 fn build_whole_number(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> i32 {
     let number = recursive_build_number(&schematic, x, y)
         .iter()
@@ -225,20 +210,7 @@ fn build_whole_number(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> i32 {
     return number;
 }
 
-fn build_whole_numbers(schematic: &Vec<Vec<char>>, coords: &Vec<(usize, usize)>) -> Vec<i32> {
-    let mut numbers: Vec<i32> = Vec::new();
-
-    for (x, y) in coords {
-        let number_string = recursive_build_number(&schematic, *x, *y)
-            .iter()
-            .cloned()
-            .collect::<String>();
-        debug!("Whole number {number_string}");
-        numbers.push(number_string.parse().unwrap());
-    }
-    return numbers;
-}
-
+/// Find how large a number is, using recursion to shift right till last number is found
 fn recursive_build_number(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> Vec<char> {
     // If out of bounds or number no longer digit return false
     if !in_bounds(&schematic, x, y) || !is_coord_digit(&schematic, x, y) {
@@ -250,22 +222,14 @@ fn recursive_build_number(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> Vec
     return tmp;
 }
 
+/// Check if coord is digit
 fn is_coord_digit(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> bool {
     let is_digit = schematic[y][x].is_ascii_digit();
     debug!("{x} {y}, is digit {is_digit}");
     return is_digit;
 }
 
-fn print_schematic(schematic: &Vec<Vec<char>>) {
-    for x in schematic {
-        println!("{:?}", x)
-    }
-}
-
-fn print_exact_char_schematic(schematic: &Vec<Vec<char>>, x: usize, y: usize) {
-    println!("{}", schematic[x][y]);
-}
-
+/// Check if coords are within bounds of schematic
 fn in_bounds(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> bool {
     // 4.saturating_sub(rhs) TODO Add this instead of using isize to check if sub would wrap around.
     // if y.saturating_sub(-1) || x.saturating_sub(-1) {
@@ -277,50 +241,14 @@ fn in_bounds(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> bool {
     return true;
 }
 
-fn symbol_near(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> bool {
-    //Upper Left
-    if in_bounds(&schematic, x.saturating_sub(1), y.saturating_sub(1))
-        && SYMBOLS.contains(&schematic[y.saturating_sub(1)][x.saturating_sub(1)])
-    {
-        return true;
+fn print_schematic(schematic: &Vec<Vec<char>>) {
+    for x in schematic {
+        println!("{:?}", x)
     }
-    //Upper
-    if in_bounds(&schematic, x, y.saturating_sub(1))
-        && SYMBOLS.contains(&schematic[y.saturating_sub(1)][x])
-    {
-        return true;
-    }
-    //Upper Right
-    if in_bounds(&schematic, x + 1, y.saturating_sub(1))
-        && SYMBOLS.contains(&schematic[y.saturating_sub(1)][x + 1])
-    {
-        return true;
-    }
-    // Right
-    if in_bounds(&schematic, x + 1, y) && SYMBOLS.contains(&schematic[y][x + 1]) {
-        return true;
-    }
-    // Down Right
-    if in_bounds(&schematic, x + 1, y + 1) && SYMBOLS.contains(&schematic[y + 1][x + 1]) {
-        return true;
-    }
-    // Down
-    if in_bounds(&schematic, x, y + 1) && SYMBOLS.contains(&schematic[y + 1][x]) {
-        return true;
-    }
-    // Down Left
-    if in_bounds(&schematic, x.saturating_sub(1), y + 1)
-        && SYMBOLS.contains(&schematic[y + 1][x.saturating_sub(1)])
-    {
-        return true;
-    }
-    // Left
-    if in_bounds(&schematic, x.saturating_sub(1), y)
-        && SYMBOLS.contains(&schematic[y][x.saturating_sub(1)])
-    {
-        return true;
-    }
-    return false;
+}
+
+fn print_exact_char_schematic(schematic: &Vec<Vec<char>>, x: usize, y: usize) {
+    println!("{}", schematic[x][y]);
 }
 
 #[cfg(test)]
@@ -357,8 +285,7 @@ mod tests {
     #[test]
     fn test_problem1() {
         // Sample
-        let input =
-            fs::read_to_string("data/sample/day_03.txt").expect("Data file doesn't exist!");
+        let input = fs::read_to_string("data/sample/day_03.txt").expect("Data file doesn't exist!");
         let expected = 4361;
         assert_eq!(problem1(&input), expected);
         // Actual
@@ -370,8 +297,7 @@ mod tests {
     #[test]
     fn test_problem2() {
         // Sample
-        let input =
-            fs::read_to_string("data/sample/day_03.txt").expect("Data file doesn't exist!");
+        let input = fs::read_to_string("data/sample/day_03.txt").expect("Data file doesn't exist!");
         let expected = 467835;
         assert_eq!(problem2(&input), expected);
         // Actual
