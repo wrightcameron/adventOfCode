@@ -164,12 +164,12 @@ mod tests {
     fn test_problem1() {
         // Sample
         let input =
-            fs::read_to_string("data/sample/day_02_sample.txt").expect("Data file doesn't exist!");
+            fs::read_to_string("data/sample/day_02.txt").expect("Data file doesn't exist!");
         let expected = 8;
         assert_eq!(problem1(&input), expected);
         //Actual
-        let input = fs::read_to_string("data/day_01.txt").expect("Data file doesn't exist!");
-        let expected = get_solution("day01".to_string(), 1);
+        let input = fs::read_to_string("data/day_02.txt").expect("Data file doesn't exist!");
+        let expected = get_solution("day02".to_string(), 1);
         assert_eq!(problem1(&input) as i64, expected);
     }
 
@@ -177,12 +177,12 @@ mod tests {
     fn test_problem2() {
         // Sample
         let input =
-            fs::read_to_string("data/sample/day_02_sample.txt").expect("Data file doesn't exist!");
+            fs::read_to_string("data/sample/day_02.txt").expect("Data file doesn't exist!");
         let expected = 2286;
         assert_eq!(problem2(&input), expected);
         //Actual
-        let input = fs::read_to_string("data/day_01.txt").expect("Data file doesn't exist!");
-        let expected = get_solution("day01".to_string(), 2);
+        let input = fs::read_to_string("data/day_02.txt").expect("Data file doesn't exist!");
+        let expected = get_solution("day02".to_string(), 2);
         assert_eq!(problem2(&input) as i64, expected);
     }
 }

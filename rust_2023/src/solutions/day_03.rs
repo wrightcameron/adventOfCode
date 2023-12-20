@@ -1,5 +1,7 @@
 use log::debug;
 
+const SYMBOLS: [char; 11] = ['*', '#', '+', '$', '-', '&', '%', '@', '/', '=', '$'];
+
 pub fn problem1(input: &String) -> i32 {
     // Create a 2D array, this array is going to be an array of arrays.
     let lines = input.lines();
@@ -276,18 +278,6 @@ fn in_bounds(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> bool {
 }
 
 fn symbol_near(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> bool {
-    let mut SYMBOLS: Vec<char> = Vec::new(); // TODO change this to a tuple
-    SYMBOLS.push('*');
-    SYMBOLS.push('#');
-    SYMBOLS.push('+');
-    SYMBOLS.push('$');
-    SYMBOLS.push('-');
-    SYMBOLS.push('&');
-    SYMBOLS.push('%');
-    SYMBOLS.push('@');
-    SYMBOLS.push('/');
-    SYMBOLS.push('=');
-    SYMBOLS.push('$');
     //Upper Left
     if in_bounds(&schematic, x.saturating_sub(1), y.saturating_sub(1))
         && SYMBOLS.contains(&schematic[y.saturating_sub(1)][x.saturating_sub(1)])
@@ -336,7 +326,29 @@ fn symbol_near(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde::Deserialize;
+    use serde_json;
     use std::fs;
+
+    #[derive(Deserialize, Debug)]
+    struct Solution {
+        id: String,
+        first: i64,
+        second: i64,
+    }
+
+    fn get_solution(day: String, problem: i8) -> i64 {
+        let json_string =
+            fs::read_to_string("data/solutions.json").expect("JSON file doesn't exist!");
+        let json: Vec<Solution> =
+            serde_json::from_str(&json_string).expect("JSON was not well-formatted");
+        let solution = json.iter().find(|x| x.id == day).unwrap();
+        return if problem == 1 {
+            solution.first
+        } else {
+            solution.second
+        };
+    }
 
     //Arrange
     //Act
@@ -344,17 +356,27 @@ mod tests {
 
     #[test]
     fn test_problem1() {
+        // Sample
         let input =
-            fs::read_to_string("data/sample/day_03_sample.txt").expect("Data file doesn't exist!");
+            fs::read_to_string("data/sample/day_03.txt").expect("Data file doesn't exist!");
         let expected = 4361;
         assert_eq!(problem1(&input), expected);
+        // Actual
+        let input = fs::read_to_string("data/day_03.txt").expect("Data file doesn't exist!");
+        let expected = get_solution("day03".to_string(), 1);
+        assert_eq!(problem1(&input) as i64, expected);
     }
 
-    // #[test]
-    // fn test_problem2() {
-    //     let input =
-    //         fs::read_to_string("data/sample/day_03_sample2.txt").expect("Data file doesn't exist!");
-    //     let expected = 281;
-    //     assert_eq!(problem2(&input), expected);
-    // }
+    #[test]
+    fn test_problem2() {
+        // Sample
+        let input =
+            fs::read_to_string("data/sample/day_03.txt").expect("Data file doesn't exist!");
+        let expected = 467835;
+        assert_eq!(problem2(&input), expected);
+        // Actual
+        let input = fs::read_to_string("data/day_03.txt").expect("Data file doesn't exist!");
+        let expected = get_solution("day03".to_string(), 2);
+        assert_eq!(problem2(&input) as i64, expected);
+    }
 }

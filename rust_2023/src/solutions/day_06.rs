@@ -66,3 +66,61 @@ fn run_race(distance: i64, time: i64, button_press: i64) -> i64 {
     debug!("Button Press {}, Distance traveled: {}", button_press, acceleration * (time - button_press));
     return acceleration * (time - button_press);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde::Deserialize;
+    use serde_json;
+    use std::fs;
+
+    #[derive(Deserialize, Debug)]
+    struct Solution {
+        id: String,
+        first: i64,
+        second: i64,
+    }
+
+    fn get_solution(day: String, problem: i8) -> i64 {
+        let json_string =
+            fs::read_to_string("data/solutions.json").expect("JSON file doesn't exist!");
+        let json: Vec<Solution> =
+            serde_json::from_str(&json_string).expect("JSON was not well-formatted");
+        let solution = json.iter().find(|x| x.id == day).unwrap();
+        return if problem == 1 {
+            solution.first
+        } else {
+            solution.second
+        };
+    }
+
+    //Arrange
+    //Act
+    //Assert
+
+    #[test]
+    fn test_problem1() {
+        // Sample
+        let input =
+            fs::read_to_string("data/sample/day_06.txt").expect("Data file doesn't exist!");
+        let expected = 288;
+        assert_eq!(problem1(&input), expected);
+        // Actual
+        let input = fs::read_to_string("data/day_06.txt").expect("Data file doesn't exist!");
+        let expected = get_solution("day06".to_string(), 1);
+        assert_eq!(problem1(&input) as i64, expected);
+    }
+
+    #[test]
+    fn test_problem2() {
+        // Sample
+        let input =
+            fs::read_to_string("data/sample/day_06.txt").expect("Data file doesn't exist!");
+        let expected = 71503;
+        assert_eq!(problem2(&input), expected);
+        // Actual
+        let input = fs::read_to_string("data/day_06.txt").expect("Data file doesn't exist!");
+        let expected = get_solution("day06".to_string(), 2);
+        assert_eq!(problem2(&input) as i64, expected);
+    }
+}
