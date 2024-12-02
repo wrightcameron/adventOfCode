@@ -120,7 +120,12 @@ fn run_day_01(){
 }
 
 fn run_day_02(){
-    println!("Day 2 is not implented yet");
+    let input = fs::read_to_string("data/day_02.txt")
+        .expect("Data file doesn't exist!");
+    let mut output = solutions::day_02::problem1(&input);
+    println!("Part 1: The count is: {output}");
+    output = solutions::day_02::problem2(&input);
+    println!("Part 2: The count is: {output}");
 }
 
 fn run_day_03(){
