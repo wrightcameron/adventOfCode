@@ -58,8 +58,8 @@ fn toggle_lights(lights: &mut [[bool; 1000]; 1000], start_x: i32, start_y: i32, 
 fn count_lights(lights: &[[bool; 1000]; 1000]) -> i32 {
     // TODO Could use flatten on this 2d array
     let mut lights_on = 0;
-    for (i, row) in lights.iter().enumerate() {
-        for (y, col) in row.iter().enumerate() {
+    for row in lights.iter() {
+        for col in row.iter() {
             if *col == true {
                 lights_on += 1;
             }

@@ -1,12 +1,12 @@
 
-type coord = (i32, i32);
+type Coord = (i32, i32);
 
 /// Problem 1,
 pub fn problem1(input: &str) -> i32 {
     input.lines().map(| line | {
-        let mut coordinates: coord = (0,0);
+        let mut coordinates: Coord = (0,0);
         // let mut unique_houses = 0;
-        let mut house_coordinates: Vec<coord> = vec![coordinates];
+        let mut house_coordinates: Vec<Coord> = vec![coordinates];
         for i in line.chars() {
             match i {
                 '^' => coordinates.1 += 1,
@@ -27,9 +27,9 @@ pub fn problem1(input: &str) -> i32 {
 /// Problem 2,
 pub fn problem2(input: &str) -> i32 {
     input.lines().map(| line | {
-        let mut coordinates: coord = (0,0);
+        let mut coordinates: Coord = (0,0);
         // let mut unique_houses = 0;
-        let mut house_coordinates: Vec<coord> = vec![coordinates];
+        let mut house_coordinates: Vec<Coord> = vec![coordinates];
         let santa_directions = line.chars()
             .enumerate()
             .filter(|&(i, _)| i % 2 == 0 )

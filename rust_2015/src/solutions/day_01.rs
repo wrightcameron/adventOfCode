@@ -1,4 +1,3 @@
-use log::debug;
 
 /// Problem 1,
 pub fn problem1(input: &str) -> i32 {

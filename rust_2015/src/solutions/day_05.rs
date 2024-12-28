@@ -36,7 +36,7 @@ fn disallowed_strings(input: &str) -> bool {
 
 /// Problem 2,
 pub fn problem2(input: &str) -> i32 {
-    0
+    todo!()
 }
 
 #[cfg(test)]

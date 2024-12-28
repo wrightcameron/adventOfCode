@@ -1,4 +1,3 @@
-use log::debug;
 use std::cmp;
 
 /// Problem 1,
@@ -82,7 +81,6 @@ mod tests {
         assert_eq!(problem1(input), expected);
         //Actual
         let input = fs::read_to_string("data/day_02.txt").expect("Data file doesn't exist!");
-        // 1603895 too high
         let expected = get_solution("day02".to_string(), 1);
         assert_eq!(problem1(&input) as i64, expected);
     }
@@ -99,7 +97,6 @@ mod tests {
         //Actual
         let input = fs::read_to_string("data/day_02.txt").expect("Data file doesn't exist!");
         let expected = get_solution("day02".to_string(), 2);
-        // 3732796 too low
         assert_eq!(problem2(&input) as i64, expected);
     }
 

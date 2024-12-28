@@ -1,61 +1,215 @@
 use std::collections::HashMap;
 
+#[derive(Debug)]
 struct Instruction<'a> {
-    command: &'a str,
+    command: Option<Command>,
     args: [&'a str; 2],
     destination: &'a str,
 }
 
-/// Problem 1,
-pub fn problem1(input: &str) -> i32 {
-    let mut signals: HashMap<&str, u16> = HashMap::new();
-    for line in input.lines() {
-        let (left, right) = line.split_once("->").unwrap();
-        let variable = right.trim();
+#[derive(Debug)]
+enum Command {
+    And,
+    Or,
+    LShift,
+    RShift,
+    Not,
+}
+
+impl <'a> Instruction<'a> {
+    pub fn new(instruct_str: &'a str) -> Self {
+        let (left, right) = instruct_str.split_once("->").unwrap();
+        let destination = right.trim();
         let statement = left.trim().split_whitespace().collect::<Vec<&str>>();
+        let mut args: [&str; 2] = [""; 2];
+        let mut command: Option<Command> = None;
         // Exp: 123 -> x
         if statement.len() == 1 {
-            let value = return_digit_or_variable(&signals, statement[0]);
-            signals.insert(variable, value);
+            args[0] = statement[0];
+            command = None;
         } 
         // Exp: NOT x -> h
         else if statement.len() == 2 {
-            let value = ! return_digit_or_variable(&signals, statement[1]);
-            signals.insert(variable, value);
+            args[0] = statement[1];
+            command = Some(Command::Not);
         } 
         // Exp: x AND y -> d
         else if statement.len() == 3 {
-            let left_value = return_digit_or_variable(&signals, statement[0]);
+            args[0] = statement[0];
+            args[1] = statement[2];
             let operation = statement[1];
-            let right_value = return_digit_or_variable(&signals, statement[2]);
-            match operation {
+            command = match operation {
                 "AND" => {
-                    let res = left_value & right_value;
-                    signals.insert(variable, res);
+                    Some(Command::And)
                 },
                 "OR" => {
-                    let res = left_value | right_value;
-                    signals.insert(variable, res);
+                    Some(Command::Or)
                 },
                 "LSHIFT" => {
-                    let res = left_value << right_value;
-                    signals.insert(variable, res);
+                    Some(Command::LShift)
                 },
                 "RSHIFT" => {
-                    let res = left_value >> right_value;
-                    signals.insert(variable, res);
+                    Some(Command::RShift)
                 },
                 _ => panic!("Unrecognized symbol")
-            }
+            };
         } else {
             panic!("Left side statement has 0 or greater than 3 elements");
         }
+        Instruction {
+            command,
+            args,
+            destination
+        }
     }
-    // dbg!(signals);
-    if signals.contains_key("a") {
-        *signals.get("a").unwrap() as i32
-    } else {
-        0
+}
+
+/// Problem 1,
+pub fn problem1(input: &str) -> i32 {
+    parse_and_find_signal(input, "a")
+}
+
+fn parse_and_find_signal(input: &str, wire: &str) -> i32 {
+    let mut instructions: HashMap<&str, Instruction> = HashMap::new();
+    for instruction in input.lines().map(| line | Instruction::new(line)) {
+        instructions.insert(instruction.destination, instruction);
+    }
+    let mut known_wires: HashMap<&str, u16> = HashMap::new();
+    calculate_signal(wire, &instructions, &mut known_wires) as i32
+}
+
+fn calculate_signal<'a>(wire: &str, instructions: &HashMap<&str, Instruction<'a>>, known_wires: &mut HashMap<&'a str, u16>) -> u16 {
+    let wire = instructions.get(wire).unwrap();
+    // dbg!(wire);
+    match wire.command {
+        Some(Command::And) => {
+            let arg1 = if wire.args[0].chars().all(| c | c.is_digit(10)){
+                wire.args[0].parse().unwrap()
+            }else{
+                if known_wires.contains_key(wire.args[0]) {
+                    *known_wires.get(wire.args[0]).unwrap()
+                } else {
+                    let calc = calculate_signal(wire.args[0], &instructions, known_wires);
+                    known_wires.insert(wire.args[0], calc);
+                    calc
+                }
+            };
+            let arg2 = if wire.args[1].chars().all(| c | c.is_digit(10)){
+                wire.args[1].parse().unwrap()
+            }else{
+                if known_wires.contains_key(wire.args[1]) {
+                    *known_wires.get(wire.args[1]).unwrap()
+                } else {
+                    let calc = calculate_signal(wire.args[1], &instructions, known_wires);
+                    known_wires.insert(wire.args[1], calc);
+                    calc
+                }
+            };
+            arg1 & arg2
+        },
+        Some(Command::Or) => {
+            let arg1 = if wire.args[0].chars().all(| c | c.is_digit(10)){
+                wire.args[0].parse().unwrap()
+            }else{
+                if known_wires.contains_key(wire.args[0]) {
+                    *known_wires.get(wire.args[0]).unwrap()
+                } else {
+                    let calc = calculate_signal(wire.args[0], &instructions, known_wires);
+                    known_wires.insert(wire.args[0], calc);
+                    calc
+                }
+            };
+            let arg2 = if wire.args[1].chars().all(| c | c.is_digit(10)){
+                wire.args[1].parse().unwrap()
+            }else{
+                if known_wires.contains_key(wire.args[1]) {
+                    *known_wires.get(wire.args[1]).unwrap()
+                } else {
+                    let calc = calculate_signal(wire.args[1], &instructions, known_wires);
+                    known_wires.insert(wire.args[1], calc);
+                    calc
+                }
+            };
+            arg1 | arg2
+        },
+        Some(Command::LShift) => {
+            let arg1 = if wire.args[0].chars().all(| c | c.is_digit(10)){
+                wire.args[0].parse().unwrap()
+            }else{
+                if known_wires.contains_key(wire.args[0]) {
+                    *known_wires.get(wire.args[0]).unwrap()
+                } else {
+                    let calc = calculate_signal(wire.args[0], &instructions, known_wires);
+                    known_wires.insert(wire.args[0], calc);
+                    calc
+                }
+            };
+            let arg2 = if wire.args[1].chars().all(| c | c.is_digit(10)){
+                wire.args[1].parse().unwrap()
+            }else{
+                if known_wires.contains_key(wire.args[1]) {
+                    *known_wires.get(wire.args[1]).unwrap()
+                } else {
+                    let calc = calculate_signal(wire.args[1], &instructions, known_wires);
+                    known_wires.insert(wire.args[1], calc);
+                    calc
+                }
+            };
+            arg1 << arg2
+        },
+        Some(Command::RShift) => {
+            let arg1 = if wire.args[0].chars().all(| c | c.is_digit(10)){
+                wire.args[0].parse().unwrap()
+            }else{
+                if known_wires.contains_key(wire.args[0]) {
+                    *known_wires.get(wire.args[0]).unwrap()
+                } else {
+                    let calc = calculate_signal(wire.args[0], &instructions, known_wires);
+                    known_wires.insert(wire.args[0], calc);
+                    calc
+                }
+            };
+            let arg2 = if wire.args[1].chars().all(| c | c.is_digit(10)){
+                wire.args[1].parse().unwrap()
+            }else{
+                if known_wires.contains_key(wire.args[1]) {
+                    *known_wires.get(wire.args[1]).unwrap()
+                } else {
+                    let calc = calculate_signal(wire.args[1], &instructions, known_wires);
+                    known_wires.insert(wire.args[1], calc);
+                    calc
+                }
+            };
+            arg1 >> arg2
+        },
+        Some(Command::Not) => {
+            let arg1 = if wire.args[0].chars().all(| c | c.is_digit(10)){
+                wire.args[0].parse().unwrap()
+            }else{
+                if known_wires.contains_key(wire.args[0]) {
+                    *known_wires.get(wire.args[0]).unwrap()
+                } else {
+                    let calc = calculate_signal(wire.args[0], &instructions, known_wires);
+                    known_wires.insert(wire.args[0], calc);
+                    calc
+                }
+            };
+            ! arg1
+        },
+        None => {
+            let arg1 = if wire.args[0].chars().all(| c | c.is_digit(10)){
+                wire.args[0].parse().unwrap()
+            }else{
+                if known_wires.contains_key(wire.args[0]) {
+                    *known_wires.get(wire.args[0]).unwrap()
+                } else {
+                    let calc = calculate_signal(wire.args[0], &instructions, known_wires);
+                    known_wires.insert(wire.args[0], calc);
+                    calc
+                }
+            };
+            arg1
+        }
     }
 }
 
@@ -108,18 +262,35 @@ mod tests {
     //Assert
 
     #[test]
+    fn test_parse_and_find_signal() {
+        let input = "123 -> x\n\
+                        456 -> y\n\
+                        x AND y -> d\n\
+                        x OR y -> e\n\
+                        x LSHIFT 2 -> f\n\
+                        y RSHIFT 2 -> g\n\
+                        NOT x -> h\n\
+                        NOT y -> i";
+        let expected = 72;
+        assert_eq!(parse_and_find_signal(input, "d"), expected);
+        let expected = 507;
+        assert_eq!(parse_and_find_signal(input, "e"), expected);
+        let expected = 492;
+        assert_eq!(parse_and_find_signal(input, "f"), expected);
+        let expected = 114;
+        assert_eq!(parse_and_find_signal(input, "g"), expected);
+        let expected = 65412;
+        assert_eq!(parse_and_find_signal(input, "h"), expected);
+        let expected = 65079;
+        assert_eq!(parse_and_find_signal(input, "i"), expected);
+        let expected = 123;
+        assert_eq!(parse_and_find_signal(input, "x"), expected);
+        let expected = 456;
+        assert_eq!(parse_and_find_signal(input, "y"), expected);
+    }
+
+    #[test]
     fn test_problem1() {
-        // Sample
-        // let input = "123 -> x\n\
-        //                 456 -> y\n\
-        //                 x AND y -> d\n\
-        //                 x OR y -> e\n\
-        //                 x LSHIFT 2 -> f\n\
-        //                 y RSHIFT 2 -> g\n\
-        //                 NOT x -> h\n\
-        //                 NOT y -> i";
-        // let expected = 0;
-        // assert_eq!(problem1(input), expected);
         //Actual
         let input = fs::read_to_string("data/day_07.txt").expect("Data file doesn't exist!");
         let expected = get_solution("day07".to_string(), 1);
