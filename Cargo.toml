@@ -1,0 +1,3 @@
+[workspace]
+members = ["", "common", "rust-2025"]
+resolver = "3"
