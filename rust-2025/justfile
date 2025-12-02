@@ -1,0 +1,10 @@
+check:
+	cargo check --tests
+run:
+	cargo build
+test:
+	cargo test
+lint:
+	cargo clippy
+fmt:
+	cargo fmt
