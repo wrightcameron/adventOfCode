@@ -4,21 +4,25 @@ pub fn problem1(input: &String) -> i64 {
     let (tape, after) = input.split_once("\n\n").unwrap();
     let lines = after.lines();
     let mut cfg = HashMap::new();
-    for line in lines{
+    for line in lines {
         let (before, after) = line.split_once("=").unwrap();
         let key = before.trim();
         // let after2 = after2.replace(&['(', ')'][..], "");
-        
+
         let (left, right) = after.split_once(",").unwrap();
-        cfg.insert(key, (left.trim().replace("(", ""), right.trim().replace(")", "")) );
+        cfg.insert(
+            key,
+            (left.trim().replace("(", ""), right.trim().replace(")", "")),
+        );
     }
     // println!("{:?}", cfg["AAA"]);
     let mut count = 0;
     let mut current_key = "AAA";
     // Get to the end of the tape
-   
+
     while current_key != "ZZZ" {
-        let (new_count, new_current_key) = iterate_through_tape(tape.chars().collect(), &cfg, count, current_key);
+        let (new_count, new_current_key) =
+            iterate_through_tape(tape.chars().collect(), &cfg, count, current_key);
         count = new_count;
         current_key = new_current_key;
         println!("Current state {}, the count {}", current_key, count);
@@ -28,7 +32,12 @@ pub fn problem1(input: &String) -> i64 {
     return count;
 }
 
-fn iterate_through_tape<'a>(tape: Vec<char>, map: &'a HashMap<&'a str, (String, String) >, count: i64, current_key: &'a str) -> (i64, &'a str) {
+fn iterate_through_tape<'a>(
+    tape: Vec<char>,
+    map: &'a HashMap<&'a str, (String, String)>,
+    count: i64,
+    current_key: &'a str,
+) -> (i64, &'a str) {
     let mut count = count;
     let mut current_key = current_key;
     for t in tape {
@@ -39,7 +48,7 @@ fn iterate_through_tape<'a>(tape: Vec<char>, map: &'a HashMap<&'a str, (String, 
             current_key = &map[current_key].1;
         }
         if current_key == "ZZZ" {
-            break
+            break;
         }
     }
     return (count, current_key);
@@ -53,29 +62,8 @@ pub fn problem2(input: &String) -> i64 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde::Deserialize;
-    use serde_json;
+    use common::get_solution;
     use std::fs;
-
-    #[derive(Deserialize, Debug)]
-    struct Solution {
-        id: String,
-        first: i64,
-        second: i64,
-    }
-
-    fn get_solution(day: String, problem: i8) -> i64 {
-        let json_string =
-            fs::read_to_string("data/solutions.json").expect("JSON file doesn't exist!");
-        let json: Vec<Solution> =
-            serde_json::from_str(&json_string).expect("JSON was not well-formatted");
-        let solution = json.iter().find(|x| x.id == day).unwrap();
-        return if problem == 1 {
-            solution.first
-        } else {
-            solution.second
-        };
-    }
 
     //Arrange
     //Act
@@ -84,8 +72,7 @@ mod tests {
     #[test]
     fn test_problem1() {
         // Sample
-        let input =
-            fs::read_to_string("data/sample/day_08.txt").expect("Data file doesn't exist!");
+        let input = fs::read_to_string("data/sample/day_08.txt").expect("Data file doesn't exist!");
         let expected = 6;
         assert_eq!(problem1(&input), expected);
         // Actual

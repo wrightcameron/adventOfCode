@@ -13,7 +13,10 @@ pub fn problem1(input: &String) -> i32 {
     // print_exact_char_schematic(&engine_schematic, 0, 0);
 
     let coords = find_coord_of_symbols(&engine_schematic);
-    return coords.iter().map(| (x, y) | find_sum_around_cord(&engine_schematic, *x, *y)).sum();
+    return coords
+        .iter()
+        .map(|(x, y)| find_sum_around_cord(&engine_schematic, *x, *y))
+        .sum();
 }
 
 // Find all gear symbols and then multiple 2 numbers around gear and then sum up all those numbers.
@@ -41,7 +44,7 @@ fn find_coord_of_symbols(schematic: &Vec<Vec<char>>) -> Vec<(usize, usize)> {
 }
 
 /// Get all the gear ratios in the schematic
-/// 
+///
 /// A gear ratio is a * symbol that has two numbers around it,
 /// both numbers have to be present and then are multiplied.
 fn get_gear_ratios(schematic: &Vec<Vec<char>>) -> Vec<i32> {
@@ -60,7 +63,11 @@ fn get_gear_ratios(schematic: &Vec<Vec<char>>) -> Vec<i32> {
 }
 
 /// Get all number coords around given coord
-fn get_all_number_cords_around_cord(schematic: &Vec<Vec<char>>, x: usize, y: usize) -> Vec<(usize, usize)> {
+fn get_all_number_cords_around_cord(
+    schematic: &Vec<Vec<char>>,
+    x: usize,
+    y: usize,
+) -> Vec<(usize, usize)> {
     let mut number_coords: Vec<(usize, usize)> = Vec::new();
     //Upper Left
     if in_bounds(&schematic, x.saturating_sub(1), y.saturating_sub(1))
@@ -254,29 +261,8 @@ fn print_exact_char_schematic(schematic: &Vec<Vec<char>>, x: usize, y: usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde::Deserialize;
-    use serde_json;
+    use common::get_solution;
     use std::fs;
-
-    #[derive(Deserialize, Debug)]
-    struct Solution {
-        id: String,
-        first: i64,
-        second: i64,
-    }
-
-    fn get_solution(day: String, problem: i8) -> i64 {
-        let json_string =
-            fs::read_to_string("data/solutions.json").expect("JSON file doesn't exist!");
-        let json: Vec<Solution> =
-            serde_json::from_str(&json_string).expect("JSON was not well-formatted");
-        let solution = json.iter().find(|x| x.id == day).unwrap();
-        return if problem == 1 {
-            solution.first
-        } else {
-            solution.second
-        };
-    }
 
     //Arrange
     //Act
